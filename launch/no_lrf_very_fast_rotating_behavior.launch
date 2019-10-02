@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="/dev/ROVER_BOARD" />
+    <!--param name="port" value="/dev/ttyUSB3" /-->
+    <param name="baud" value="115200" />
+  </node>
+  <node name="very_fast_rotating_behavior" pkg="commu_rover" type="very_fast_rotating_behavior" output="screen" />
+</launch>

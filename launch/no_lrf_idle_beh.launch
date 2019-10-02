@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="/dev/ROVER_BOARD" />
+    <param name="baud" value="115200" />
+  </node>
+  <node name="rover_rand_beh" pkg="commu_rover" type="random_driver" output="screen" />
+</launch>
