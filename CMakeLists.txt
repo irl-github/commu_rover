@@ -9,6 +9,7 @@ project(commu_rover)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
 )
 
@@ -269,5 +270,5 @@ target_link_libraries(commu_sad_walk_with_cyl ${catkin_LIBRARIES})
 add_executable(commu_happy_walk_with_cyl src/commu_happy_walk_with_cyl.cpp)
 target_link_libraries(commu_happy_walk_with_cyl ${catkin_LIBRARIES})
 
-add_executable(commu_thank_you_for_listening src/commu_thank_you_for_listening.cpp)
-target_link_libraries(commu_thank_you_for_listening ${catkin_LIBRARIES})
+add_executable(commu_experience src/commu_experience.cpp)
+target_link_libraries(commu_experience ${catkin_LIBRARIES}) 
