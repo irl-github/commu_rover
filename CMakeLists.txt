@@ -272,3 +272,12 @@ target_link_libraries(commu_happy_walk_with_cyl ${catkin_LIBRARIES})
 
 add_executable(commu_experience src/commu_experience.cpp)
 target_link_libraries(commu_experience ${catkin_LIBRARIES}) 
+
+add_executable(commu_walk_straight src/commu_walk_straight.cpp)
+target_link_libraries(commu_walk_straight ${catkin_LIBRARIES}) 
+
+add_executable(commu_walk_straight_with_eye src/commu_walk_straight_with_eye.cpp)
+target_link_libraries(commu_walk_straight_with_eye ${catkin_LIBRARIES}) 
+
+add_executable(commu_experiment src/commu_experiment.cpp)
+target_link_libraries(commu_experiment ${catkin_LIBRARIES})

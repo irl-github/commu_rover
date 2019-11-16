@@ -17,8 +17,8 @@
 #define PORT_TALK 8078
 #define HOSTNAME "commu-081.local"
 #define IPADD "192.168.1.149"
-#define saying_num 4
-#define cylinder_num 3
+#define saying_num 2
+#define cylinder_num 0
 
 void mySigintHandler(int sig)
 {
@@ -56,39 +56,56 @@ int main(int argc, char **argv) {
 
   //[saying_num][cylinder_num] 
   //up, down, up and down slowly, up and down fast, oscillate slow, oscillate fast, do nothing
-  double A[6][6] = {{0.05, 0.05, 0.04, 0.04, 0.025, 0.015}, //happy
-     		    {0.08, 0.08, 0.04, 0.04, 0.025, 0.015}, //angry
-		    {0.06, 0.04, 0.01, 0.04, 0.0005, 0.015}, //sad
-		    {0.08, 0.08, 0.04, 0.04, 0.025, 0.015}, //fear
-		    {0.06, 0.04, 0.04, 0.04, 0.025, 0.015}, //surprise
-		    {0.08, 0.08, 0.04, 0.04, 0.025, 0.015}};//disgust
-  float Duration[6][7] = {{0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0},
-			  {0.6, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0},
-			  {0.5, 0.8, 1.0, 1.5, 1.0, 1.5, 1.0},
-			  {0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0},
-			  {0.6, 0.5, 1.0, 1.5, 1.0, 1.0, 1.0},
+  double A[7][6] = {{0.08, 0.04, 0.04, 0.04, 0.025, 0.05}, //happy
+     		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //angry
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //sad
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //fear
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //surprise
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //disgust
+		    {0.08, 0.08, 0.04, 0.04, 0.025, 0.015}};//もとのやつ
+  
+  float Duration[7][7] = {{0.5, 0.8, 1.5, 1.5, 1.0, 1.5, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.5, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
 			  {0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0}};
   float Start = 0.3;
   //float Start = 0.2; used this before
   
   if(saying_num == 0){
-    voice_hello = "/say_eng { So happy }";
+    //voice_hello = "/say_eng { So happy }";
+    voice_hello = "/say 私は喜びを感じています";
+    //voice_hello = "/say うれしい";
   }else if(saying_num == 1){
-    voice_hello = "/say_eng { So angry }";
+    //voice_hello = "/say_eng { So angry }";
+    voice_hello = "/say 私は怒りを感じています";
+    //voice_hello = "/say 怒った";
   }else if(saying_num == 2){
     //voice_hello = "/say_eng { So sad }";
-    voice_hello = "/say 悲しい";
+    //voice_hello = "/say 悲しい";
+    voice_hello = "/say 私は悲しみを感じています";
     //voice_hello = "/say ガーン";
     gesture1 = "/gesture init";
     gesture2 = "/gesture sad";
   }else if(saying_num == 3){
-    voice_hello = "/say_eng { So pleasant }";
+    //voice_hello = "/say_eng { So pleasant }";
+    voice_hello = "/say 私は恐れを感じています";
+    //voice_hello = "/say 怖い";
   }else if(saying_num == 4){
     //voice_hello = "/say_eng { So suprise }";
-    voice_hello = "/say わあ！";
+    //voice_hello = "/say びっくり！";
+    //voice_hello = "/say 驚いた！"; 
+    //voice_hello = "/say わあ！";
+    voice_hello = "/say 私は驚きを感じています";
     gesture1 = "/gesture surprise_position";
     gesture2 = "/gesture fast_sugoi";    
-  }else if(saying_num == 5) voice_hello = "/say_eng { So disgust }";
+  }else if(saying_num == 5){
+    //voice_hello = "/say_eng { So disgust }";
+    voice_hello = "/say 私は反感を感じています";
+    //voice_hello = "/say ムカムカする";
+  }
 
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0 || (voice_sock = socket(AF_INET, SOCK_STREAM, 0) ) <0){ 
       printf("\n Socket creation error \n"); 
@@ -162,7 +179,7 @@ int main(int argc, char **argv) {
 
     if(counter==0) {
       firstTime = time(0);
-      send(sock , gesture1 , strlen(gesture1) , 0 );
+      //send(sock , gesture1 , strlen(gesture1) , 0 );
       counter++;
     }
 
@@ -174,8 +191,8 @@ int main(int argc, char **argv) {
 	afterIniTime = time(0);
 	after = getMicrotime();
 	timeOfFirstLoop = false;
-	send(sock , gesture2 , strlen(gesture2) , 0 );
-	send(voice_sock , voice_hello , strlen(voice_hello) , 0 );   
+	//send(sock , gesture2 , strlen(gesture2) , 0 );
+	//send(voice_sock , voice_hello , strlen(voice_hello) , 0 );   
       }
       difference = ((double)getMicrotime() - (double)after) / 1000000;
       //up
@@ -210,19 +227,26 @@ int main(int argc, char **argv) {
         else msg.linear.z = 0;
       }
       //osillate fast
-      else if(cylinder_num == 3){
-        if(difference < (Duration[saying_num][cylinder_num] /4) ) msg.linear.z = A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
-        else if((difference > Duration[saying_num][cylinder_num] /4) && (difference < Duration[saying_num][cylinder_num] /2)) msg.linear.z = -A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
-	else if((difference > Duration[saying_num][cylinder_num] /2) && (difference < Duration[saying_num][cylinder_num] /4*3)) msg.linear.z = A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
-	else if((difference > Duration[saying_num][cylinder_num] /4*3) && (difference < Duration[saying_num][cylinder_num] )) msg.linear.z = -A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
-        else msg.linear.z = 0;
-      }
+       else if(cylinder_num == 3){
+         if(difference < (Duration[saying_num][cylinder_num] /4) ) msg.linear.z = A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
+         else if((difference > Duration[saying_num][cylinder_num] /4) && (difference < Duration[saying_num][cylinder_num] /2)) msg.linear.z = -A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
+       	else if((difference > Duration[saying_num][cylinder_num] /2) && (difference < Duration[saying_num][cylinder_num] /4*3)) msg.linear.z = A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
+       	else if((difference > Duration[saying_num][cylinder_num] /4*3) && (difference < Duration[saying_num][cylinder_num] )) msg.linear.z = -A[saying_num][cylinder_num]  *2 / Duration[saying_num][cylinder_num] ;
+         else msg.linear.z = 0;
+       }
+
+      // else if(cylinder_num == 3){
+      //  if(difference < Duration[saying_num][cylinder_num] ) msg.linear.z = (A[saying_num][cylinder_num] / M_PI/4*0.75) * sin(difference*M_PI*2/0.75);
+      //  else msg.linear.z = 0;
+      // }
+
+      
       else if(cylinder_num == 4){
 	if(difference < Duration[saying_num][cylinder_num] ) msg.linear.z = (A[saying_num][cylinder_num] * M_PI) * cos(difference*M_PI);
 	else msg.linear.z = 0;
       }
       else if(cylinder_num == 5){
-	if(difference < Duration[saying_num][cylinder_num] ) msg.linear.z = A[saying_num][cylinder_num]  * M_PI * 2 * cos(difference*M_PI*2);
+	if(difference < Duration[saying_num][cylinder_num] ) msg.linear.z = A[saying_num][cylinder_num]  * M_PI * 2 * sin(difference*M_PI*2);
 	else msg.linear.z = 0;
       }
 
