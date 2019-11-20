@@ -67,7 +67,7 @@ def talker():
     msg.angular.y = 0
     msg.angular.z = 0
     while not rospy.is_shutdown():
-        msg.linear.z *= -1
+#        msg.linear.z *= -1
         pub.publish(msg)
         rate.sleep()
 

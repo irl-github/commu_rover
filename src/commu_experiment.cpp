@@ -17,11 +17,11 @@
 #define PORT_TALK 8078
 #define HOSTNAME "commu-081.local"
 #define IPADD "192.168.1.149"
-#define saying_num 0
-#define cylinder_num 3
+#define saying_num 3
+#define cylinder_num 8
 
-double A[8] = {0.08, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04};
-float Duration[8] = {0.5, 0.8, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5};
+double A[8] = {0.06, 0.04, 0.04, 0.08, 0.3, 0.04, 0.04, 0.15};
+float Duration[8] = {0.5, 0.8, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0};
 
 void mySigintHandler(int sig)
 {
@@ -66,41 +66,40 @@ geometry_msgs::Twist cylinder_movement(double difference){
 
   //up and fast oscillate 
   else if(cylinder_num == 2){
-    if(difference < Duration[cylinder_num]  / 2 ) msg.linear.z = A[cylinder_num]  / Duration[cylinder_num] ;
-    else if((difference > Duration[cylinder_num] /2) && (difference < Duration[cylinder_num] )) msg.linear.z = -A[cylinder_num]  / Duration[cylinder_num] ;
+    if((difference < Duration[0]) && (difference > Start)) msg.linear.z = A[0]  / Duration[0] ;
+    else if((difference > Duration[0]) && (difference < Duration[cylinder_num] )) msg.linear.z = (A[4] * Duration[4] / M_PI/ 8 ) * cos((difference-Duration[0])*M_PI*8 /Duration[4] );
     else msg.linear.z = 0;
   }
   //down and fast oscillate
   else if(cylinder_num == 3){
-    if(difference < (Duration[cylinder_num] /4) ) msg.linear.z = A[cylinder_num]  *2 / Duration[cylinder_num] ;
-    else if((difference > Duration[cylinder_num] /4) && (difference < Duration[cylinder_num] /2)) msg.linear.z = -A[cylinder_num]  *2 / Duration[cylinder_num] ;
+    if((difference < Duration[1])&&(difference > Start)) msg.linear.z = -A[1] / Duration[1] ;
+    else if((difference > Duration[1] ) && (difference < Duration[cylinder_num])) msg.linear.z = -(A[4] * Duration[4] / M_PI/ 8 ) * cos((difference-Duration[1])*M_PI*8 /Duration[4] );
     else msg.linear.z = 0;
   }
 
   //fast oscillate
   else if(cylinder_num == 4){
-    if(difference < Duration[cylinder_num] ) msg.linear.z = (A[cylinder_num] * Duration[cylinder_num] / M_PI/ 2 ) * cos(difference*M_PI*2 /Duration[cylinder_num] );
+    if(difference < Duration[cylinder_num] ) msg.linear.z = (A[cylinder_num] * Duration[cylinder_num] / M_PI/ 8 ) * cos(difference*M_PI*8 /Duration[cylinder_num] );
     else msg.linear.z = 0;
   }
 
   //up and slow oscillate
   else if(cylinder_num == 5){
-    if(difference < Duration[cylinder_num] ) msg.linear.z = (A[cylinder_num] * M_PI) * cos(difference*M_PI);
-    else if((difference > Duration[cylinder_num] /4) && (difference < Duration[cylinder_num] /2)) msg.linear.z = -A[cylinder_num]  *2 / Duration[cylinder_num] ;
+    if((difference < Duration[0]) && (difference > Start)) msg.linear.z = A[0]  / Duration[0] ;
+    else if((difference > Duration[0]) && (difference < Duration[cylinder_num]))msg.linear.z = (A[7] * Duration[7] / M_PI/ 4 ) * cos((difference-Duration[0])*M_PI*4 /Duration[7] );
     else msg.linear.z = 0;
   }
 
   //down and slow oscillate
   else if(cylinder_num == 6){
-    if(difference < Duration[cylinder_num] ) msg.linear.z = A[cylinder_num]  * M_PI * 2 * sin(difference*M_PI*2);
-    else if((difference > Duration[cylinder_num] /4) && (difference < Duration[cylinder_num] /2)) msg.linear.z = -A[cylinder_num]  *2 / Duration[cylinder_num] ;
+    if((difference < Duration[1])&&(difference > Start)) msg.linear.z = -A[1] / Duration[1] ;
+    else if((difference > Duration[1]) && (difference < Duration[cylinder_num])) msg.linear.z = -(A[7] * Duration[7] / M_PI/ 4 ) * cos((difference-Duration[1])*M_PI*4 /Duration[7] );
     else msg.linear.z = 0;
   }
 
   //slow oscillate
   else if(cylinder_num == 7){
-    if(difference < (Duration[cylinder_num] /4) ) msg.linear.z = A[cylinder_num]  *2 / Duration[cylinder_num] ;
-    else if((difference > Duration[cylinder_num] /4) && (difference < Duration[cylinder_num] /2)) msg.linear.z = -A[cylinder_num]  *2 / Duration[cylinder_num] ;
+    if(difference < Duration[cylinder_num]) msg.linear.z = (A[cylinder_num] * Duration[cylinder_num] / M_PI/ 4 ) * cos(difference*M_PI*4 /Duration[cylinder_num] );
     else msg.linear.z = 0;
   }
   
@@ -174,6 +173,9 @@ int main(int argc, char **argv) {
   }else if(saying_num == 8){
     gesture1 = "/gesture init";
     gesture2 = "/gesture annshinn2";    
+  }else if(saying_num == 8){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture init";    
   } 
 
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0 || (voice_sock = socket(AF_INET, SOCK_STREAM, 0) ) <0){ 
