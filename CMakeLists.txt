@@ -281,3 +281,6 @@ target_link_libraries(commu_walk_straight_with_eye ${catkin_LIBRARIES})
 
 add_executable(commu_experiment src/commu_experiment.cpp)
 target_link_libraries(commu_experiment ${catkin_LIBRARIES})
+
+add_executable(commu_experiment_longlasting src/commu_experiment_longlasting.cpp)
+target_link_libraries(commu_experiment_longlasting ${catkin_LIBRARIES})

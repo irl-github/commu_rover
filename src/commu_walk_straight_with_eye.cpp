@@ -14,7 +14,7 @@
 //
 #define PORT 8079
 #define PORT_TALK 8078
-#define HOSTNAME "commu-081.local"
+#define HOSTNAME "commu-082.local"
 #define IPADD "192.168.1.149"
 
 //#define DEBUG_INFO
