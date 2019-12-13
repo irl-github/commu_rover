@@ -1,0 +1,3 @@
+<launch>
+  <node name="rotating_behavior" pkg="commu_rover" type="rotating_behavior" output="screen" />
+</launch>

@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 
        counter++;
 
-       msg.linear.x = 0.1;
+       msg.linear.x = 0.5;
        msg.angular.z = 0.5;
        
        //Publish the message

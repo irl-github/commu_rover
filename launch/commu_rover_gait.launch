@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+ <node pkg="rosserial_python" name="serial_node" type="serial_node.py" output="screen">
+  <param name="port" value="/dev/ROVER_BOARD" />
+  <param name="baud" value="115200" />
+ </node>
+ 
+ <node name="Mixer" pkg="silva_core" type="mixer.py" args="commu_with_mobility" output="screen"/>
+ <node name="Idle" pkg="silva_core" type="idle.py" args="commu_with_mobility" output="screen"/>
+ <node name="Reflex" pkg="silva_core" type="reflex.py" args="commu_with_mobility" output="screen"/>
+ <node name="Slave" pkg="silva_core" type="slave.py" args="commu_with_mobility" output="screen"/>
+ <node name="Auto" pkg="silva_core" type="auto.py" args="commu_with_mobility" output="screen"/>
+
+ <node name="commu_controller" pkg="silva_core" type="commutel.py" args="commu_with_mobility" output="screen" />
+
+ <node name="rover_conrtoller" pkg="commu_rover" type="rover_pos_control.py" output="screen" />
+
+</launch>

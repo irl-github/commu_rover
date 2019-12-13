@@ -14,7 +14,7 @@
 //
 #define PORT 8079
 #define PORT_TALK 8078
-#define HOSTNAME "commu-081.local"
+#define HOSTNAME "commu-080.local"
 #define IPADD "192.168.1.149"
 
 void mySigintHandler(int sig)
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
       else{
 	difference = ((double)getMicrotime() - (double)after) / 10000;
 
-	if(difference <= 2000){
+	if(difference <= 1000){
 
 	  if(difftime(time(0), firstTime) > (initializationDuration + 3.0)){
 	    msg.linear.x = 0.2;
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
 	    ROS_INFO("2 diff : %lf",difference);
 	  }
 	}
-        else if(difference >= 2000){
+        else{
 	  if(gesture2Loop == true){
 	    send(sock , hello2 , strlen(hello2) , 0 );
 	    gesture2Loop = false;

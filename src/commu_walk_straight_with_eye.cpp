@@ -14,7 +14,7 @@
 //
 #define PORT 8079
 #define PORT_TALK 8078
-#define HOSTNAME "commu-081.local"
+#define HOSTNAME "commu-080.local"
 #define IPADD "192.168.1.149"
 
 //#define DEBUG_INFO
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   int voice_sock = 0; 
   struct sockaddr_in serv_addr, voice_serv_addr;
   struct hostent *server, *voice_server;
-  char const *gst_walk_eye = "/gesture walk_with_eye"; //kyorokyoro";
+  char const *gst_walk_eye = "/gesture walk"; //kyorokyoro";
   char const *gst_walk = "/gesture walk"; //kyorokyoro";
   //char const *walk2 = "/gesture walk";
   //char const *voice_hello = "/say_eng { hello }";
@@ -149,10 +149,10 @@ int main(int argc, char **argv) {
       else{
 	difference = ((double)getMicrotime() - (double)after) / 10000;
 
-	if(difference <= 2000){
+	if(difference <= 1500){
 
 	  if(difftime(time(0), firstTime) > (initializationDuration + 3.0)){
-	    msg.linear.x = 0.2;
+	    //msg.linear.x = 0.2;
 	    //msg.angular.z = 0.5;
 	  }
 
@@ -190,17 +190,17 @@ int main(int argc, char **argv) {
 	  if(gesture2Loop == true){
 	    send(sock , hello2 , strlen(hello2) , 0 );
 	    gesture2Loop = false;
-	    msg.linear.x = 0.1;
+	    //msg.linear.x = 0.1;
 	  }
-	  if(gesture4Loop == true && difference >= 2200){
+	  if(gesture4Loop == true && difference >= 1700){
 	    send(sock , hello4 , strlen(hello4) , 0 );
 	    gesture4Loop = false;
 	  }
-	  if(sayingLoop == true && difference >= 2200){
+	  if(sayingLoop == true && difference >= 1700){
 	    send(voice_sock ,voice_hello , strlen(voice_hello) , 0 );
 	    sayingLoop = false;
 	  }
-	  if(gesture3Loop == true && difference >= 2300){
+	  if(gesture3Loop == true && difference >= 1800){
 	    send(sock , hello3 , strlen(hello3) , 0 );
 	    gesture3Loop = false;
 	    msg.linear.x = 0;
