@@ -17,12 +17,12 @@
 #define PORT_TALK 8078
 #define HOSTNAME "commu-080.local"
 #define IPADD "192.168.1.149"
-#define saying_num 3
+#define saying_num 5
 #define cylinder_num 4
-#define A_num 0
-#define T_num 1
+#define A_num 1
+#define T_num 2
 
-double A[3] = {0.005, 0.005+0.005/2, 0.01};
+double A[4] = {0, 0.005, 0.005+0.005/2, 0.01};
 float oscillate_time = 10;
 double T[5] = {0.4, 0.4+1.4/4, 0.4+1.4/4*2, 0.4+1.4/4*3, 1.8};
 
@@ -119,16 +119,20 @@ int main(int argc, char **argv) {
 
   else if(saying_num == 5){
     gesture1 = "/gesture init";
-    gesture2 = "/gesture happy2";
+    gesture2 = "/gesture long_happy_ueda";
+    //gesture2 = "/gesture momo_long_happy";
   }else if(saying_num == 6){
     gesture1 = "/gesture init";
-    gesture2 = "/gesture long_angry";
+    gesture2 = "/gesture long_angry_ueda";
+    //gesture2 = "/gesture momo_long_angry";
   }else if(saying_num == 7){
     gesture1 = "/gesture init";
-    gesture2 = "/gesture sad2";
+    gesture2 = "/gesture long_sad_ueda";
+    //gesture2 = "/gesture momo_long_sad";
   }else if(saying_num == 8){
     gesture1 = "/gesture init";
-    gesture2 = "/gesture annshinn2";    
+    //gesture2 = "/gesture momo_long_anshin";
+    gesture2 = "/gesture long_relieved_ueda";
   }
   
 
