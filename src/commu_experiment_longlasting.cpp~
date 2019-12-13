@@ -6,20 +6,25 @@
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <string.h> 
+#include <math.h>
 //
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
- #include <sys/time.h>
+#include <sys/time.h>
 //
 #define PORT 8079
 #define PORT_TALK 8078
-
 #define HOSTNAME "commu-080.local"
-//#define HOSTNAME "commu-082.local"
 #define IPADD "192.168.1.149"
+#define saying_num 3
+#define cylinder_num 4
+#define A_num 0
+#define T_num 1
 
-//#define DEBUG_INFO
+double A[3] = {0.005, 0.005+0.005/2, 0.01};
+float oscillate_time = 10;
+double T[3] = {0.4, 1.2, 1.8};
 
 void mySigintHandler(int sig)
 {
@@ -35,27 +40,103 @@ void mySigintHandler(int sig)
 }
 
 long getMicrotime(){
-   struct timeval currentTime;
-   gettimeofday(&currentTime, NULL);
-   return currentTime.tv_sec * (int)1e6 + currentTime.tv_usec;
+  struct timeval currentTime;
+  gettimeofday(&currentTime, NULL);
+  return currentTime.tv_sec * (int)1e6 + currentTime.tv_usec;
 }
 
+geometry_msgs::Twist cylinder_movement(double difference){
+  float Start = 0.3;
+  geometry_msgs::Twist msg;
+
+  //fast oscillate
+  if(cylinder_num != 10){
+    if(difference < oscillate_time ) msg.linear.z = (A[A_num] / T[T_num]*2*M_PI  ) * cos(difference*M_PI*2/T[T_num] );
+    else msg.linear.z = 0;
+  }
+  
+  //do nothing
+  else if(cylinder_num == 10) msg.linear.z = 0;
+
+  return msg;
+}
+		      
 int main(int argc, char **argv) {
 
   int sock = 0;
   int voice_sock = 0; 
   struct sockaddr_in serv_addr, voice_serv_addr;
   struct hostent *server, *voice_server;
-  char const *gst_walk_eye = "/gesture walk"; //kyorokyoro";
-  char const *gst_walk = "/gesture walk"; //kyorokyoro";
-  //char const *walk2 = "/gesture walk";
-  //char const *voice_hello = "/say_eng { hello }";
-  char const *voice_hello = "/say こんにちは";
-  char const *hello2 = "/gesture init";
-  char const *hello3 = "/gesture ojigi";
-  char const *hello4 = "/gesture uemuku";
   char buffer[1024] = {0};
+  char const *gesture1;
+  char const *gesture2;
   char voice_buffer[1024] = {0};
+  char const *voice_hello;
+  struct tm *time_st;
+  struct timeval myTime;
+
+  //[saying_num][cylinder_num] 
+  //up, down, up and fast oscillate, up and slow oscillate, down and fast oscillate, down and slow oscillate, fast oscillate, slow oscillate, do nothing
+
+
+  /* double A[7][10] = {{0.08, 0.04, 0.04, 0.04, 0.025, 0.05}, //happy
+     		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //angry
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //sad
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //pleasant
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //surprise
+		    {0.08, 0.04, 0.04, 0.04, 0.025, 0.015}, //disgust
+		    {0.08, 0.08, 0.04, 0.04, 0.025, 0.015}};//もとのやつ
+  
+  float Duration[7][10] = {{0.5, 0.8, 1.5, 1.5, 1.0, 1.5, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.5, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.8, 1.5, 1.5, 1.0, 1.0, 1.0},
+			  {0.5, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0}}; */
+  
+ 
+  //float Start = 0.2; used this before
+  
+  if(saying_num == 0){
+    gesture1 = "/gesture happy_position";
+    gesture2 = "/gesture happy_position";
+  }else if(saying_num == 1){
+    gesture1 = "/gesture angry_position";
+    gesture2 = "/gesture angry_position";
+  }else if(saying_num == 2){
+    gesture1 = "/gesture sad_position";
+    gesture2 = "/gesture sad_position";
+  }else if(saying_num == 3){
+    gesture1 = "/gesture relieved_position";
+    gesture2 = "/gesture relieved_position";
+  }
+
+  else if(saying_num == 4){
+    gesture1 = "/gesture surprise_position";
+    gesture2 = "/gesture fast_sugoi";    
+  }
+
+  else if(saying_num == 5){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture happy2";
+  }else if(saying_num == 6){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture long_angry";
+  }else if(saying_num == 7){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture sad2";
+  }else if(saying_num == 8){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture annshinn2";    
+  }
+  
+
+  else if(saying_num == 9){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture init";    
+  } 
+
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0 || (voice_sock = socket(AF_INET, SOCK_STREAM, 0) ) <0){ 
       printf("\n Socket creation error \n"); 
       return -1; 
@@ -106,27 +187,18 @@ int main(int argc, char **argv) {
   srand(time(0));
 
   //Sets the loop to publish at a rate of 10Hz
-  ros::Rate rate(100);
+  ros::Rate rate(150);
 
   int counter = 0;
-  int walk_cnt = 0;
 
-  time_t firstTime, afterIniTime, kyoroTime;
+  time_t firstTime, afterIniTime;
   const float initializationDuration = 10.0; // 10s for initialization of the robot and the rover
   bool timeOfFirstLoop = true;
-  bool kyoroLoop = true;
-  bool walk2Loop = true;
-  int counteye = 0;
-  bool gesture2Loop = true;
-  bool gesture3Loop = true;
-  bool sayingLoop = true;
-  bool gesture4Loop = true;
   const float cylSpeed = 0.04;
   const float linSpeed = 0.15;  //was 0.05
-  const float forwardingDuration = 3.0;
-  const float cylPeriod = 1;
   double difference;
   long after;
+  
   //Declares the message to be sent
   geometry_msgs::Twist msg;
 
@@ -135,97 +207,26 @@ int main(int argc, char **argv) {
 	      
   while(ros::ok()) {
 
-    if(counter==0) firstTime = time(0);
-    counter++;
+    if(counter==0) {
+      firstTime = time(0);
+      send(sock , gesture1 , strlen(gesture1) , 0 );
+      counter++;
+    }
 
     if(difftime(time(0), firstTime) < initializationDuration ) {
       msg.linear.x = 0;
-      msg.linear.z = -cylSpeed / 2;
     }
     else{
       if(timeOfFirstLoop){
 	afterIniTime = time(0);
 	after = getMicrotime();
 	timeOfFirstLoop = false;
+	send(sock , gesture2 , strlen(gesture2) , 0 );    
       }
-      else{
-	difference = ((double)getMicrotime() - (double)after) / 10000;
-
-	if(difference <= 1500){
-
-	  if(difftime(time(0), firstTime) > (initializationDuration + 3.0)){
-	    //msg.linear.x = 0.2;
-	    //msg.angular.z = 0.5;
-	  }
-
-	  int const period_gest = 250;
-	  if(((int)difference % period_gest >= 0) && ((int)difference % period_gest <= (period_gest-100)) && (kyoroLoop == true)){
-	    kyoroLoop = false;
-	    walk_cnt++;
-	    ROS_INFO("walk_cnt = %d", walk_cnt);
-	    if(walk_cnt % 5 == 0) {send(sock , gst_walk_eye , strlen(gst_walk_eye), 0 );ROS_INFO("blink eye!!! \n");}
-	    else {send(sock , gst_walk , strlen(gst_walk) , 0 );}
-
-	    //ROS_INFO("send\n");
-	  }
-	
-       
-	  else if((int)difference % period_gest > (period_gest-100)) kyoroLoop = true;
-      
-	  if(((int)difference % 100 >= 0) && ((int)difference % 100 < 50)){
-	    //kyoroTime = time(0);
-#ifdef DEBUG_INFO
-	    ROS_INFO("1 diff : %lf",difference);  
-#endif
-	    msg.linear.z =0.04;
-	  }
-	  else if(((int)difference % 100 >= 50) && ((int)difference % 100 < 100)){
-	    //if(difftime(time(0), kyoroTime) > 14){
-	    kyoroLoop = true;
-	    msg.linear.z =-0.04;
-#ifdef DEBUG_INFO
-	    ROS_INFO("2 diff : %lf",difference);
-#endif	    
-	  }
-	}
-        else {
-	  if(gesture2Loop == true){
-	    send(sock , hello2 , strlen(hello2) , 0 );
-	    gesture2Loop = false;
-	    //msg.linear.x = 0.1;
-	  }
-	  if(gesture4Loop == true && difference >= 1700){
-	    send(sock , hello4 , strlen(hello4) , 0 );
-	    gesture4Loop = false;
-	  }
-	  if(sayingLoop == true && difference >= 1700){
-	    send(voice_sock ,voice_hello , strlen(voice_hello) , 0 );
-	    sayingLoop = false;
-	  }
-	  if(gesture3Loop == true && difference >= 1800){
-	    send(sock , hello3 , strlen(hello3) , 0 );
-	    gesture3Loop = false;
-	    msg.linear.x = 0;
-	    msg.linear.z = 0;
-	  }
-	}
-	  
-	/*	else if(((int)difference % 100 >= 50) && ((int)difference % 100 < 75)){
-	  msg.linear.z =0.04;
-	  ROS_INFO("3 diff : %lf",difference);
-	}
-	else if(((int)difference % 100 >= 75) && ((int)difference % 100 < 100)){
-	  msg.linear.z =-0.04;
-	  ROS_INFO("4 diff : %lf",difference);
-	  }*/
-	
-	
-
-	//if(difftime(time(0), kyoroTime)>0.5) msg.linear.z = -0.04;
-	//else if(difftime(time(0), kyoroTime)>=1.0) msg.linear.z = 0;
-      }
+      difference = ((double)getMicrotime() - (double)after) / 1000000;
+      msg = cylinder_movement(difference);
     }
-	 
+
     //Publish the message
     pub.publish(msg);
 

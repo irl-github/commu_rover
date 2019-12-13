@@ -17,13 +17,14 @@
 #define PORT_TALK 8078
 #define HOSTNAME "commu-080.local"
 #define IPADD "192.168.1.149"
-#define saying_num 4
-#define cylinder_num 7
+#define saying_num 5
+#define cylinder_num 4
+#define A_num 1
+#define T_num 2
 
-double A[8] = {0.05, 0.05, 0.04, 0.005, 0.005, 0.04, 0.04, 0.15};
-float Duration[8] = {0.5, 0.5, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0};
-float oscillate_time = 4;
-double T[2] = {0.4 + 1.4 / 4, 0.4 + 1.4 / 2};
+double A[4] = {0, 0.005, 0.005+0.005/2, 0.01};
+float oscillate_time = 10;
+double T[5] = {0.4, 0.4+1.4/4, 0.4+1.4/4*2, 0.4+1.4/4*3, 1.8};
 
 void mySigintHandler(int sig)
 {
@@ -47,73 +48,15 @@ long getMicrotime(){
 geometry_msgs::Twist cylinder_movement(double difference){
   float Start = 0.3;
   geometry_msgs::Twist msg;
-   
-  //up
-  if(cylinder_num == 0){
-    if((difference < Duration[cylinder_num] )&&(difference > Start)) msg.linear.z = A[cylinder_num]  / Duration[cylinder_num];
-    else msg.linear.z = 0;
-  }
-      
-  //down
-  else if(cylinder_num == 1){
-    if((difference < Duration[cylinder_num] )&&(difference > Start)){
-      msg.linear.z = -A[cylinder_num]  / Duration[cylinder_num];
-      ROS_INFO("A; %lf, Duration; %lf, time; %lf, difference; %lf ",A[cylinder_num],Duration[cylinder_num],(double)getMicrotime()/ 1000000,difference);
-    }
-    else{
-      msg.linear.z = 0;
-      ROS_INFO("else A; %lf, Duration; %lf, time; %lf, difference; %lf ",A[cylinder_num],Duration[cylinder_num],(double)getMicrotime()/ 1000000,difference);
-    }
-  }
-
-  //up and fast oscillate 
-  else if(cylinder_num == 2){
-    if((difference < Duration[0]) && (difference > Start)) msg.linear.z = A[0]  / Duration[0] ;
-    else if((difference > Duration[0]) && (difference < oscillate_time )) msg.linear.z = (A[4] /T[0] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[0] );
-    //else if((difference > Duration[0]) && (difference < oscillate_time )) msg.linear.z = (0.005 / 1.2 *2*M_PI  ) * cos(difference*M_PI*2/1.2 );
-    else msg.linear.z = 0;
-  }
-  //down and fast oscillate
-  else if(cylinder_num == 3){
-    if((difference < Duration[1])&&(difference > Start)) msg.linear.z = -A[1] / Duration[1] ;
-    else if((difference > Duration[1] ) && (difference < oscillate_time)) msg.linear.z = -(A[4] /T[0] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[0] );
-      //msg.linear.z = -(A[4] * Duration[4] / M_PI/ 8 ) * cos((difference-Duration[1])*M_PI*8 /Duration[4] );
-    else msg.linear.z = 0;
-  }
 
   //fast oscillate
-  else if(cylinder_num == 4){
-    if(difference < oscillate_time ) msg.linear.z = (A[4] /T[0] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[0] );
-
-      //msg.linear.z = (A[cylinder_num] * Duration[cylinder_num] / M_PI/ 8 ) * cos(difference*M_PI*8 /Duration[cylinder_num] );
-    else msg.linear.z = 0;
-  }
-
-  //up and slow oscillate
-  else if(cylinder_num == 5){
-    if((difference < Duration[0]) && (difference > Start)) msg.linear.z = A[0]  / Duration[0] ;
-    else if((difference > Duration[0]) && (difference < oscillate_time)) msg.linear.z = (A[4] /T[1] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[1] );
-      //msg.linear.z = (A[7] * Duration[7] / M_PI/ 4 ) * cos((difference-Duration[0])*M_PI*4 /Duration[7] );
-    else msg.linear.z = 0;
-  }
-
-  //down and slow oscillate
-  else if(cylinder_num == 6){
-    if((difference < Duration[1])&&(difference > Start)) msg.linear.z = -A[1] / Duration[1] ;
-    else if((difference > Duration[1]) && (difference < oscillate_time)) msg.linear.z = -(A[4] /T[1] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[1] );
-//msg.linear.z = -(A[7] * Duration[7] / M_PI/ 4 ) * cos((difference-Duration[1])*M_PI*4 /Duration[7] );
-    else msg.linear.z = 0;
-  }
-
-  //slow oscillate
-  else if(cylinder_num == 7){
-    if(difference < oscillate_time ) msg.linear.z = (A[4] /T[1] * 2 * M_PI) * cos((difference-Duration[0])*M_PI*2 / T[1] );
-    //msg.linear.z = (A[cylinder_num] * Duration[cylinder_num] / M_PI/ 4 ) * cos(difference*M_PI*4 /Duration[cylinder_num] );
+  if(cylinder_num != 10){
+    if(difference < oscillate_time ) msg.linear.z = (A[A_num] / T[T_num]*2*M_PI  ) * cos(difference*M_PI*2/T[T_num] );
     else msg.linear.z = 0;
   }
   
   //do nothing
-  else if(cylinder_num == 8) msg.linear.z = 0;
+  else if(cylinder_num == 10) msg.linear.z = 0;
 
   return msg;
 }
@@ -156,18 +99,44 @@ int main(int argc, char **argv) {
   //float Start = 0.2; used this before
   
   if(saying_num == 0){
-    gesture1 = "/gesture init";
-    gesture2 = "/gesture short_happy_hamed";
+    gesture1 = "/gesture happy_position";
+    gesture2 = "/gesture happy_position";
   }else if(saying_num == 1){
-    gesture1 = "/gesture init";
-    gesture2 = "/gesture angry";
+    gesture1 = "/gesture angry_position";
+    gesture2 = "/gesture angry_position";
   }else if(saying_num == 2){
-    gesture1 = "/gesture init";
-    gesture2 = "/gesture short_sad_hamed";
+    gesture1 = "/gesture sad_position";
+    gesture2 = "/gesture sad_position";
   }else if(saying_num == 3){
+    gesture1 = "/gesture relieved_position";
+    gesture2 = "/gesture relieved_position";
+  }
+
+  else if(saying_num == 4){
+    gesture1 = "/gesture surprise_position";
+    gesture2 = "/gesture fast_sugoi";    
+  }
+
+  else if(saying_num == 5){
     gesture1 = "/gesture init";
-    gesture2 = "/gesture anshin_momo";
-  }else if(saying_num == 4){
+    gesture2 = "/gesture long_happy_ueda";
+    //gesture2 = "/gesture momo_long_happy";
+  }else if(saying_num == 6){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture long_angry_ueda";
+    //gesture2 = "/gesture momo_long_angry";
+  }else if(saying_num == 7){
+    gesture1 = "/gesture init";
+    gesture2 = "/gesture long_sad_ueda";
+    //gesture2 = "/gesture momo_long_sad";
+  }else if(saying_num == 8){
+    gesture1 = "/gesture init";
+    //gesture2 = "/gesture momo_long_anshin";
+    gesture2 = "/gesture long_relieved_ueda";
+  }
+  
+
+  else if(saying_num == 9){
     gesture1 = "/gesture init";
     gesture2 = "/gesture init";    
   } 
